@@ -1,0 +1,19 @@
+# Ignore .jar files (including all subdirectories)
+*.jar
+
+# Ignore build directories
+**/build/
+
+# Ignore the IntelliJ IDEA project files (if you're using IntelliJ)
+.idea/
+
+# Ignore all logs
+*.log
+
+# Ignore system files
+.DS_Store
+
+# Ignore IDE-specific files for Eclipse
+*.classpath
+*.project
+*.settings/

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: songs-service
+  namespace: k8s-program
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: songs-service
+  template:
+    metadata:
+      labels:
+        app: songs-service
+    spec:
+      containers:
+        - name: songs-service
+          image: localhost:5000/songs-service:latest
+          ports:
+            - containerPort: 8080
+#          volumeMounts:
+#            - mountPath: /data
+#              name: songs-volume
+#      volumes:
+#        - name: songs-volume
+#          persistentVolumeClaim:
+#            claimName: songs-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: songs-service
+  namespace: k8s-program
+spec:
+  selector:
+    app: songs-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: NodePort
