@@ -14,21 +14,21 @@ spec:
         app: resources-service
     spec:
       containers:
-      - name: resources-service
-        image: localhost:5000/resources-service:latest
-        ports:
-        - containerPort: 8080
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: resources-service
-  namespace: k8s-program
-spec:
-  selector:
-    app: resources-service
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
-  type: NodePort
+        - name: resources-service
+          image: localhost:5000/resources-service:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: app-env-vars
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: db-username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: db-password

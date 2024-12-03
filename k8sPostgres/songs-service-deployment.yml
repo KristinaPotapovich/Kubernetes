@@ -17,25 +17,18 @@ spec:
         - name: songs-service
           image: localhost:5000/songs-service:latest
           ports:
-            - containerPort: 8080
-#          volumeMounts:
-#            - mountPath: /data
-#              name: songs-volume
-#      volumes:
-#        - name: songs-volume
-#          persistentVolumeClaim:
-#            claimName: songs-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: songs-service
-  namespace: k8s-program
-spec:
-  selector:
-    app: songs-service
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
-  type: NodePort
+            - containerPort: 8081
+          envFrom:
+            - configMapRef:
+                name: app-env-vars
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: db-username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: db-password
