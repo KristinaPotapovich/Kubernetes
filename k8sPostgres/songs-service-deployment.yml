@@ -5,6 +5,11 @@ metadata:
   namespace: k8s-program
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:
       app: songs-service
@@ -15,7 +20,7 @@ spec:
     spec:
       containers:
         - name: songs-service
-          image: localhost:5000/songs-service:latest
+          image: localhost:5000/songs-service:v2
           ports:
             - containerPort: 8081
           envFrom:
@@ -32,3 +37,22 @@ spec:
                 secretKeyRef:
                   name: db-credentials
                   key: db-password
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8081
+            initialDelaySeconds: 70
+            periodSeconds: 10
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8081
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 5

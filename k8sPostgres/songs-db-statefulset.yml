@@ -33,12 +33,31 @@ spec:
           volumeMounts:
             - name: songs-db-storage
               mountPath: /var/lib/postgresql/data
-            - name: db-init-script
-              mountPath: /docker-entrypoint-initdb.d/ # Directory for initialization scripts
-      volumes:
-        - name: db-init-script
-          configMap:
-            name: db-init-scripts # ConfigMap containing the SQL initialization scripts
+          startupProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U postgres
+            initialDelaySeconds: 70
+            periodSeconds: 10
+            failureThreshold: 10
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U postgres
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U postgres
+            initialDelaySeconds: 5
+            periodSeconds: 5
   volumeClaimTemplates:
     - metadata:
         name: songs-db-storage
