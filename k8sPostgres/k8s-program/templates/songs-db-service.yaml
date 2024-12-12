@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.songs.db.name }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.songs.db.name }}
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.Version }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Values.songs.db.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.songs.db.containerPort }}
+      targetPort: {{ .Values.songs.db.containerPort }}

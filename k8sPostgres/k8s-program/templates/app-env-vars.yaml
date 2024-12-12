@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-env-vars
+  namespace: {{ .Values.global.namespace }}
+data:
+  RESOURCES_MS_NAME: "{{ .Values.resources.service.name }}"
+  RESOURCES_MS_PORT: "{{ .Values.resources.service.port }}"
+  SONGS_MS_NAME: "{{ .Values.songs.service.name }}"
+  SONGS_MS_PORT: "{{ .Values.songs.service.port }}"
+  EUREKA_URI: "localhost"
+  ENABLE_EUREKA_CLIENT: "false"
+  RESOURCES_DB_HOST: "{{ .Values.resources.db.name }}.{{ .Values.global.namespace }}.svc.cluster.local"
+  RESOURCES_DB_PORT: "{{ .Values.resources.db.containerPort }}"
+  SONGS_DB_HOST: "{{ .Values.songs.db.name }}.{{ .Values.global.namespace }}.svc.cluster.local"
+  SONGS_DB_PORT: "{{ .Values.songs.db.containerPort }}"
+  SPRING_DATASOURCE_USERNAME: "{{ .Values.dbCredentials.resources.username }}"
+  SPRING_DATASOURCE_PASSWORD: "{{ .Values.dbCredentials.resources.password }}"

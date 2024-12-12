@@ -1,0 +1,78 @@
+global:
+  namespace: k8s-program
+  serviceAccount:
+    create: true
+    name: "k8s-program"
+
+resources:
+  db:
+    name: resources-db
+    replicas: 1
+    image: postgres:15
+    databaseName: "resourcesdb"
+    containerPort: 5432
+    storageClassName: local-path
+    storageSize: 1Gi
+    initScriptsConfigMap: db-init-scripts-resources
+  service:
+    name: resources-service
+    image: localhost:5000/resources-service:latest
+    containerPort: 8080
+    replicas: 2
+    port: 8080
+    type: ClusterIP
+
+songs:
+  db:
+    name: songs-db
+    replicas: 1
+    image: postgres:15
+    databaseName: "songsdb"
+    containerPort: 5432
+    storageClassName: local-path
+    storageSize: 1Gi
+    initScriptsConfigMap: db-init-scripts-songs
+  service:
+    name: songs-service
+    image: localhost:5000/songs-service:latest
+    containerPort: 8081
+    replicas: 2
+    port: 8081
+    type: ClusterIP
+
+dbCredentials:
+  resources:
+    username: "postgres"
+    password: "postgres"
+  songs:
+    username: "postgres"
+    password: "postgres"
+
+ingress:
+  enabled: false
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  className: "nginx"
+  hosts:
+    - host: "resources.local"
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+    - host: "songs.local"
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+storageClass:
+  name: local-path
+  isDefaultClass: "true"
+  provisioner: rancher.io/local-path
+  reclaimPolicy: Delete
+  volumeBindingMode: WaitForFirstConsumer

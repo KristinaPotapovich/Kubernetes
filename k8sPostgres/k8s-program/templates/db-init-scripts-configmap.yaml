@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-init-scripts
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "k8s-program.labels" . | nindent 4 }}
+data:
+  init.sql: |
+    CREATE SEQUENCE IF NOT EXISTS resources_id_seq;
+    CREATE TABLE IF NOT EXISTS resources (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      description TEXT
+    );
+
+    CREATE SEQUENCE IF NOT EXISTS songs_id_seq;
+    CREATE TABLE IF NOT EXISTS songs (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NULL,
+      artist VARCHAR(255) NULL,
+      album VARCHAR(255) NULL,
+      length VARCHAR(255) NULL,
+      resource_id INT UNIQUE NOT NULL,
+      year VARCHAR(255) NULL,
+      genre VARCHAR(255) NULL
+    );

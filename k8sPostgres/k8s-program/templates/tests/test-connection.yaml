@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "k8s-program.fullname" . }}-test-connection-resources"
+  labels:
+    {{- include "k8s-program.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ .Values.resources.service.name }}:{{ .Values.resources.service.port }}']
+  restartPolicy: Never
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "k8s-program.fullname" . }}-test-connection-songs"
+  labels:
+    {{- include "k8s-program.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ .Values.songs.service.name }}:{{ .Values.songs.service.port }}']
+  restartPolicy: Never

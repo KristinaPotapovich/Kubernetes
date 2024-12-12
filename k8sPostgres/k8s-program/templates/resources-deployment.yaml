@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.resources.service.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.resources.service.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.resources.service.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.resources.service.name }}
+    spec:
+      containers:
+        - name: {{ .Values.resources.service.name }}
+          image: {{ .Values.resources.service.image }}
+          ports:
+            - containerPort: {{ .Values.resources.service.containerPort }}
+          env:
+            - name: RESOURCES_DB_HOST
+              value: "{{ .Values.resources.db.name }}.{{ .Values.global.namespace }}.svc.cluster.local"
+            - name: RESOURCES_DB_PORT
+              value: "5432"
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: resources-username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: resources-password

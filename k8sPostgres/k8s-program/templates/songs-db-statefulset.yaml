@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.songs.db.name }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.songs.db.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.songs.db.name }}
+  serviceName: {{ .Values.songs.db.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.songs.db.name }}
+    spec:
+      containers:
+        - name: postgres
+          image: {{ .Values.songs.db.image }}
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: songs-username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: songs-password
+            - name: POSTGRES_DB
+              value: "{{ .Values.songs.db.databaseName }}"
+          volumeMounts:
+            - name: db-data
+              mountPath: /var/lib/postgresql/data
+            - name: db-init-scripts
+              mountPath: /docker-entrypoint-initdb.d
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres"]
+            initialDelaySeconds: 50
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres"]
+            initialDelaySeconds: 60
+            periodSeconds: 10
+      volumes:
+        - name: db-init-scripts
+          configMap:
+            name: db-init-scripts
+  volumeClaimTemplates:
+    - metadata:
+        name: db-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: {{ .Values.songs.db.storageSize }}
+        storageClassName: {{ .Values.songs.db.storageClassName }}

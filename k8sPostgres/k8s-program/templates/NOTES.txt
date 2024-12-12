@@ -1,0 +1,32 @@
+NOTES:
+1. Resources Service URL:
+{{- if eq .Values.resources.service.type "LoadBalancer" }}
+  Run the following command to get the external IP:
+  kubectl get services --namespace {{ .Release.Namespace }}
+{{- else if eq .Values.resources.service.type "ClusterIP" }}
+  The application is accessible within the cluster only.
+{{- else }}
+  Service type is not defined for resources service.
+{{- end }}
+
+2. Songs Service URL:
+{{- if eq .Values.songs.service.type "LoadBalancer" }}
+  Run the following command to get the external IP:
+  kubectl get services --namespace {{ .Release.Namespace }}
+{{- else if eq .Values.songs.service.type "ClusterIP" }}
+  The application is accessible within the cluster only.
+{{- else }}
+  Service type is not defined for songs service.
+{{- end }}
+
+{{- if .Values.resources.service.type }}
+Resources Service Type: {{ .Values.resources.service.type }}
+{{- else }}
+Resources Service Type is not defined.
+{{- end }}
+
+{{- if .Values.songs.service.type }}
+Songs Service Type: {{ .Values.songs.service.type }}
+{{- else }}
+Songs Service Type is not defined.
+{{- end }}
