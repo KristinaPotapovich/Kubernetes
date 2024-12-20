@@ -5,9 +5,10 @@ metadata:
   name: {{ .Chart.Name }}-ingress
   namespace: {{ .Values.global.namespace }}
   annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
     {{- range $key, $value := .Values.ingress.annotations }}
-      {{ $key }}: {{ $value | quote }}
-      {{- end }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   rules:
@@ -15,24 +16,19 @@ spec:
     - host: {{ .host }}
       http:
         paths:
-          {{- range .paths }}
-          - path: {{ .path }}
-            pathType: {{ .pathType }}
+          - path: /resources
+            pathType: Prefix
             backend:
               service:
-                name: {{ include "k8s-program.fullname" $ }}
+                name: resources
                 port:
-                  number: {{ $.Values.songs.service.port }}
-          {{- end }}
+                  number: 8080
+          - path: /songs
+            pathType: Prefix
+            backend:
+              service:
+                name: songs
+                port:
+                  number: 8081
     {{- end }}
-  {{- if .Values.ingress.tls }}
-  tls:
-    {{- range .Values.ingress.tls }}
-    - secretName: {{ .secretName }}
-      hosts:
-        {{- range .hosts }}
-        - {{ . }}
-        {{- end }}
-    {{- end }}
-  {{- end }}
   {{- end }}

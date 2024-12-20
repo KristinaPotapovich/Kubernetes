@@ -21,6 +21,8 @@ resources:
     replicas: 2
     port: 8080
     type: ClusterIP
+    env:
+      SONGS_MS_URL: "http://songs:8081"
 
 songs:
   db:
@@ -33,7 +35,7 @@ songs:
     storageSize: 1Gi
     initScriptsConfigMap: db-init-scripts-songs
   service:
-    name: songs-service
+    name: songs
     image: localhost:5000/songs-service:latest
     containerPort: 8081
     replicas: 2
@@ -49,19 +51,21 @@ dbCredentials:
     password: "postgres"
 
 ingress:
-  enabled: false
+  enabled: true
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
   className: "nginx"
   hosts:
-    - host: "resources.local"
+    - host: "localhost"
       paths:
-        - path: /
-          pathType: ImplementationSpecific
-    - host: "songs.local"
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
+        - path: /resources
+          pathType: Prefix
+          backendService: resources-service
+          backendPort: 8080
+        - path: /songs
+          pathType: Prefix
+          backendService: songs-service
+          backendPort: 8081
   tls: []
 
 autoscaling:

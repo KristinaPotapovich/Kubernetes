@@ -33,3 +33,5 @@ spec:
                 secretKeyRef:
                   name: db-credentials
                   key: resources-password
+            - name: SONGS_MS_URL
+              value: "http://{{ .Values.songs.service.name }}:{{ .Values.songs.service.port }}"
